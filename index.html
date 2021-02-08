@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>problemas na cidade</title>
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-firestore.js"></script>
+    <script type="text/javascript" src="js/env.js"></script>
+    <script type="text/javascript" src="js/database.js"></script>
+    <script type="text/javascript" src="js/auth.js"></script>
+    <script type="text/javascript" src="js/form-behavior.js"></script>
+    <script type="text/javascript" src="js/load-data.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/modal.css">
+</head>
+
+<body>
+    <br><br>
+    <a id="link-modal-login" href="#abrirModalSignIn">Efetuar Login</a>
+    <a id="link-modal-criar-conta" href="#abrirModalSignUp">Criar Conta</a>
+    <a id="link-modal-alterar-senha" href="#abrirModalChangePass">Alterar Senha</a>
+    <a id="link-modal-logout" href="javascript:void(0)" onclick="deslogarUsuario();">Sair</a>
+    <p id="saudacao"></p>
+    <br><br>
+    <div id="acoes-usuarios">
+        <hr>
+        <br>
+        <a id="link-modal-cadastrar-novo-problema" href="#abrirModalCadastrarNovoProblema"
+            style="display: none;">Cadastrar novo problema</a>
+        <a id="link-modal-listar-problemas" href="javascript:void(0)" onclick="ListarProblemas(event)">Listar meus
+            problemas
+            cadastrados</a>
+        <br><br>
+        <hr>
+    </div>
+    <br><br>
+    <div id="div-meus-problemas-cadastrados">
+        <h2>Meus problemas cadastrados</h2>
+        <table id="meus-problemas-cadastrados">
+            <tr>
+                <th>Código</th>
+                <th>Descrição do problema</th>
+                <th>Local</th>
+                <th>Foto</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </table>
+    </div>
+    <br><br>
+    <div  id="div-ultimos-problemas-cadastrados">
+        <h2 id="div-ultimos-problemas-cadastrados-h2">Últimos problemas cadastrados</h2>
+        <table id="ultimos-problemas-cadastrados">
+            <tr>
+                <th>Código</th>
+                <th>Descrição do problema</th>
+                <th>Local</th>
+                <th>Foto</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </table>
+    </div>
+
+    <div id="abrirModalSignIn" class="modal-auth">
+        <a href="#fechar" title="Fechar" class="fechar">x</a>
+        <div class="form-signin">
+            <div>
+                <label for="form-signin-email">Email:<span class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-signin-email" name="email" placeholder="Digite seu e-mail" required>
+            </div>
+            <div>
+                <label for="form-signin-senha">Senha:<span class="campo-obrigatorio">*</span></label>
+                <input type="password" id="form-signin-senha" name="senha" placeholder="Senha" required>
+            </div>
+            <input type="submit" id="form-signin-criar-usuário" value="Autenticar Usuário"
+                onclick="autenticarUsuario(event)">
+            <br><br>
+        </div>
+    </div>
+    <div id="abrirModalSignUp" class="modal-auth">
+        <a href="#fechar" title="Fechar" class="fechar">x</a>
+        <div class="form-signup">
+            <div>
+                <label for="form-signup-email">Email:<span class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-signup-email" name="email" placeholder="Digite seu e-mail" required>
+            </div>
+            <div>
+                <label for="form-signup-senha1">Senha:<span class="campo-obrigatorio">*</span></label>
+                <input type="password" id="form-signup-senha1" name="senha1" placeholder="Senha" required>
+            </div>
+            <div>
+                <label for="form-signup-senha2">Confirmação de Senha:<span class="campo-obrigatorio">*</span></label>
+                <input type="password" id="form-signup-senha2" name="senha2" placeholder="Confirme sua senha" required>
+            </div>
+            <div>
+
+                <input type="checkbox" id="form-signup-tipo-usuario" name="tipo-usuario">
+                <label for="form-signup-tipo-usuario">Solicitar perfil público.</label>
+            </div>
+            <input type="submit" id="form-signup-criar-usuário" value="Sign Up" onclick="criarUsuario(event)">
+            <br><br>
+        </div>
+    </div>
+    <div id="abrirModalChangePass" class="modal-auth">
+        <a href="#fechar" title="Fechar" class="fechar">x</a>
+        <div class="form-change-pass">
+            <div>
+                <label for="form-change-pass-email">Email:<span class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-change-pass-email" name="email" placeholder="Digite seu e-mail" disabled>
+            </div>
+            <div>
+                <label for="form-change-pass-senha-antiga">Senha Antiga:<span class="campo-obrigatorio">*</span></label>
+                <input type="password" id="form-change-pass-senha-antiga" name="senha" placeholder="Senha Antiga"
+                    required>
+            </div>
+            <div>
+                <label for="form-change-pass-senha1">Senha:<span class="campo-obrigatorio">*</span></label>
+                <input type="password" id="form-change-pass-senha1" name="senha" placeholder="Senha" required>
+            </div>
+            <div>
+                <label for="form-change-pass-senha2">Confirmação de Senha:<span
+                        class="campo-obrigatorio">*</span></label>
+                <input type="password" id="form-change-pass-senha2" name="senha" placeholder="Confirme sua senha"
+                    required>
+            </div>
+            <input type="submit" id="form-change-pass-criar-usuário" value="Alterar Senha" onclick="alterarSenha(event)">
+            <br><br>
+        </div>
+    </div>
+    <div id="abrirModalCadastrarNovoProblema" class="modal-cadastrar-novo-problema">
+        <a href="#fechar" title="Fechar" class="fechar">x</a>
+        <div class="modal-cadastrar-novo-problema-form">
+            <h2>Cadastrar novo problema</h2>
+            <div id="div-form-cadastrar-novo-problema-codigo" style="display: none;">
+                <label for="form-cadastrar-novo-problema-codigo">Código:</label>
+                <input type="text" id="form-cadastrar-novo-problema-codigo" name="codigo" disabled>
+            </div>
+            <div>
+                <label for="form-cadastrar-novo-problema-descricao">Descrição do problema:<span
+                        class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-cadastrar-novo-problema-descricao" name="descricao"
+                    placeholder="Digite a descrição do problema">
+                <span id="form-cadastrar-novo-problema-descricao-mensagem" class="campo-obrigatorio"></span>
+            </div>
+            <div>
+                <label for="form-cadastrar-novo-problema-local">Local:<span class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-cadastrar-novo-problema-local" name="local"
+                    placeholder="Digite o Local que ocorreu o problema" required>
+                    <span id="form-cadastrar-novo-problema-local-mensagem" class="campo-obrigatorio"></span>
+            </div>
+            <div>
+                <label for="form-cadastrar-novo-problema-foto">Foto Atual:</label>
+                <img id="form-cadastrar-novo-problema-foto-atual">
+            </div>
+            <div>
+                <label for="form-cadastrar-novo-problema-foto">Selecione a foto do problema:</label>
+                <input type="file" id="form-cadastrar-novo-problema-foto" name="foto" accept="image/png, image/jpeg">
+            </div>
+            <div>
+                <input type="submit" id="form-cadastrar-novo-problema-submit" value="Salvar"
+                    onclick="CadastrarAlterarProblema(event)">
+
+            </div>
+            <br><br>
+        </div>
+    </div>
+    <div id="abrirModalResponderProblema" class="modal-responder-problema">
+        <a href="#fechar" title="Fechar" class="fechar">x</a>
+        <div class="modal-responder-problema-form">
+            <h2>Responder problema</h2>
+            <div>
+                <label for="form-responder-problema-problema-codigo">Código problema:<span
+                        class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-responder-problema-codigo" name="codigo-problema" disabled>
+            </div>
+            <br>
+            <div>
+                <label for="form-responder-problema-resposta">Resposta ao problema:<span
+                        class="campo-obrigatorio">*</span></label>
+                <br>
+                <textarea id="form-responder-problema-resposta" name="descricao"
+                    placeholder="Digite a resposta do problema" rows="5" cols="80"></textarea>
+            </div>
+            <div>
+                <label for="form-responder-problema-status">Status do problema:<span
+                    class="campo-obrigatorio">*</span></label>
+                <select id="form-responder-problema-status">
+                    <option value="Cadastrado">Cadastrado</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Concluído">Concluído</option>
+                </select>
+            </div>
+            <div>
+                <input type="submit" id="form-cadastrar-novo-problema-submit" value="Salvar"
+                    onclick="ResponderProblema(event)">
+            </div>
+            <br><br>
+        </div>
+    </div>
+    <div id="abrirModalVisualizarResposta" class="modal-visualizar-resposta">
+        <a href="#fechar" title="Fechar" class="fechar">x</a>
+        <div class="modal-visualizar-resposta-form">
+            <h2>Resposta problema</h2>
+            <div>
+                <label for="form-visualizar-resposta-codigo">Código problema:<span
+                        class="campo-obrigatorio">*</span></label>
+                <input type="text" id="form-visualizar-resposta-codigo" name="codigo-problema" disabled>
+            </div>
+            <br>
+            <div>
+                <label for="form-visualizar-problema-resposta">Resposta ao problema:<span
+                        class="campo-obrigatorio">*</span></label>
+                <br>
+                <textarea id="form-visualizar-problema-resposta" name="descricao"
+                    placeholder="Digite a resposta do problema" rows="5" cols="80" disabled></textarea>
+            </div>
+            <br><br>
+        </div>
+    </div>
+    <br><br>
+    <script type="text/javascript" src="js/form-behavior.js"></script>
+    <footer>
+        <br><br>
+        <p>Direito de cópia &copy;
+            <script>document.write(new Date().getFullYear())</script>
+            Apache License 2.0
+        </p>
+        <br><br>
+        <nav>
+            <ul>
+                <a href="https://www.apache.org/licenses/LICENSE-2.0">Sobre a licença</a>
+            </ul>
+        </nav>
+        <br><br>
+    </footer>
+</body>
+
+</html>
